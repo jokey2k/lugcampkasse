@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}GetränkeBar - Rechnung{% endblock %}
+{% from '_pagination.html' import render_pagination %}
+{% block body %}
+  <h2>Aktueller Kontostand</h2>
+  <ul>
+  	<li>Name: {{ bill.user.name }}
+  	<li>LUG: {{ bill.user.lug }}
+  	<li>Aktueller Kontostand: {{ "%6.2f"|format(bill.user.balance/100) }} EUR
+  </ul>
+  <h2>GetränkeBar</h2>
+  <ul>
+  {% for entry in bill.entries %}
+    <li>{{ entry.name }}
+    <li>{{ "%6.2f"|format(entry.price/100) }} EUR
+  {% endfor %}
+  </ul>
+  <h2>Gesamt</h2>
+  <ul>
+    <li>Anzahl Posten: {{ bill.accumulated_items }}
+    <li>Betrag: {{ "%6.2f"|format(bill.accumulated_price/100) }} EUR
+  </ul>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!doctype html>
+<title>LUG Camp Kasse 2012 - {% block title %}Konto{% endblock %}</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<script type=text/javascript src="{{ config.JUGGERNAUT_DRIVER }}"></script>
+<script type=text/javascript src="{{ url_for('static', filename='jquery-1.7.2.min.js') }}"></script>
+<script type=text/javascript src="{{ url_for('static', filename='lugcampkasse.js') }}"></script>
+<script type=text/javascript>
+  lugcampkasse.urlRoot = {{ request.url_root|tojson|safe }};
+</script>
+<div class=page>
+  <h1>LUG Camp Kasse</h1>
+  {% if not disable_navigation %}
+  <ul class=nav>
+    {% if user %}
+    <li><a href="{{ url_for('show_balance', code=user.code) }}">Übersicht</a>
+    {% endif %}
+    {% if bill %}
+    <li><a href="{{ url_for('show_balance', code=bill.user.code) }}">Übersicht</a>
+    {% endif %}
+    {% if g.cashier %}
+    <li><a href="{{ url_for('nextcustomer') }}">Nächster Kunde</a>
+    <li><a href="{# url_for('new_bill') #}">Neue Rechnung</a>
+    {% if g.cashier and user %}
+    <li><a href="{{ url_for('redeem_voucher', usercode=user.code) }}">Gutschein einlösen</a>
+    {% endif %}
+    <li><a href="{{ url_for('signout') }}">Abmelden</a>
+    {% endif %}
+  </ul>
+  {% endif %}
+  {% for message in get_flashed_messages() %}
+    <p class=flash>{{ message }}
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

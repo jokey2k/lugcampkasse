@@ -1,0 +1,6 @@
+*.pyc
+*.pyo
+build
+dist
+*.sqlite
+.DS_Store

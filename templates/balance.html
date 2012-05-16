@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Kontostand{% endblock %}
+{% from '_pagination.html' import render_pagination %}
+{% block body %}
+  <h2>Aktueller Kontostand</h2>
+  <ul>
+  	<li>Name: {{ user.name }}
+  	<li>LUG: {{ user.lug }}
+  	<li>Aktueller Kontostand: <span id=balance>{{ "%6.2f"|format(user.balance/100) }}</span> EUR <span id=liveupdated></span>
+  </ul>
+  <h2 class=bills>GetränkeBar</h2>
+  <ul class=bills>
+  {% for bill in pagination.items %}
+    <li><a href="{{ url_for('show_bill', code=user.code, bill_id=bill.id) }}">{{ bill.created.strftime('%H:%M @ %d.%m.%Y') }}</a> <span class=items>Einträge: {{ bill.accumulated_items }}</span> <span class=amount>Betrag: {{ "%6.2f"|format(bill.accumulated_price/100) }} EUR</span>
+  {% endfor %}
+  </ul>
+  {{ render_pagination(pagination) }}
+  {% if not g.cashier and user.allowed_cashier %}
+  <h2>Anmelden als Kasse</h2><br>
+  <form action="{{ url_for('signin') }}" method="POST">
+  	<input type=hidden name=code value={{user.code}}>
+  	<label for=password>Passwort:
+  	<input type=password name=password>
+  	<input type=submit value="Los">
+  </form>
+  {% endif %}
+  <script type=text/javascript>
+    lugcampkasse.subscribeUpdatedBalance("{{ user.code }}");
+  </script>
+{% endblock %}

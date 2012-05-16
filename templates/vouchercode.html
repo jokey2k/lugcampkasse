@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}Gutschein{% endblock %}
+{% block body %}
+  <h2>Gutschein eingelöst</h2>
+  <ul>
+  	<li>Code: {{ voucher.code }}
+  	<li>Gültig: {{ 'ja' if voucher.valid else 'nein' }}
+    <li>Eingelöst: {{ 'ja' if voucher.redeemed else 'nein' }}
+    <li>Wert: {{ "%6.2f"|format(voucher.value/100) }} EUR
+  </ul>
+{% endblock %}
