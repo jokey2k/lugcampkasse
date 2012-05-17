@@ -18,6 +18,7 @@
     {% endfor %}
     <h2 id=summe>Bereits Gebucht (<span id=summe>0.00</span> EUR)</h2>
     <form action="{{ url_for('new_bill', code=user.code) }}" method=POST>
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       <input id=bill_ids type=hidden name="bill_ids" value="">
       <input type=submit value="Rechnung speichern">
     </form>

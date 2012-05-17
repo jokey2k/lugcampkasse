@@ -7,6 +7,8 @@ from flask import Flask, request, url_for, redirect, g, session, flash, \
      abort, render_template
 from flask.signals import Namespace
 
+from flaskext.csrf import csrf
+
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import event as sqla_event
 from sqlalchemy.sql.expression import func as sqla_func
@@ -17,6 +19,7 @@ from sqlalchemy.orm.interfaces import SessionExtension, EXT_CONTINUE
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 jug = Juggernaut()
+csrf(app)
 
 # register additional template commands
 

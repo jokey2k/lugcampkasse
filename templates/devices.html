@@ -7,6 +7,7 @@
   </ul>
   <h2>Status ändern</h2><br>
   <form action="{{ url_for('devices') }}" method="POST">
+  	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   	<input type=submit value="{{ 'Deaktivieren' if is_scan_device else 'Aktivieren' }}">
   </form>
 {% endblock %}

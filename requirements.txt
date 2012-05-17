@@ -1,5 +1,6 @@
 Flask
 Flask-SQLAlchemy
 Flask-Script
+flask-csrf
 juggernaut
 blinker

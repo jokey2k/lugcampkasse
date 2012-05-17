@@ -18,6 +18,7 @@
   {% if not g.cashier and user.allowed_cashier %}
   <h2>Anmelden als Kasse</h2><br>
   <form action="{{ url_for('signin') }}" method="POST">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   	<input type=hidden name=code value={{user.code}}>
   	<label for=password>Passwort:
   	<input type=password name=password>
