@@ -14,4 +14,7 @@
     <li>LUG: {{ user.lug }}
     <li>Aktueller Kontostand: <span id=balance>{{ "%6.2f"|format(user.balance/100) }}</span> EUR
   </ul>
+  <script type=text/javascript>
+  lugcampkasse.subscribeNewCustomer("{{ g.cashier.code }}");
+  </script>
 {% endblock %}
