@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}GetränkeBar - Posten stornieren{% endblock %}
+{% block body %}
+  <div class=shopitem>
+    <h2>Posten stornieren</h2>
+    <form action="{{ url_for('cancel_item', code=user.code, bill_id=bill.id, item_id=item.id) }}" method=POST>
+      Soll {{ item.name }} von Rechnung #{{ bill.id }} von {{ user.name }} storniert werden?
+      <input type=submit value="Posten stornieren">
+    </form>
+  </div>
+{% endblock %}

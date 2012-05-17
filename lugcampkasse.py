@@ -180,6 +180,23 @@ def new_bill(code):
     items = ShopItem.query.order_by(ShopItem.category).all()
     return render_template('new_bill.html', user=user, items=items)
 
+@app.route('/<string(length=6):usercode>/bill/<int:bill_id>/cancel_item/<int:item_id>', methods=['GET', 'POST'])
+def cancel_item(usercode,bill_id,item_id):
+    if not g.cashier:
+        abort(403)
+    user = User.query.filter_by(code=usercode).first_or_404()
+    bill = Bill.query.get(bill_id)
+    item = BillEntry.query.get(item_id)
+    if bill != item.bill:
+	abort(403)
+    if request.method == "POST":
+        db.session.remove(item)
+        flash("removed item %s from bill %i" % (item.name, bill.id))
+        db.session.commit()
+        return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
+    return render_template('cancel_item.html', user=user, bill=bill, item=item)
+	
+
 @app.route('/<string(length=6):usercode>/voucher', methods=['GET', 'POST'])
 def redeem_voucher(usercode):
     if not g.cashier:
