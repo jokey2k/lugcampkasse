@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Gutschein{% endblock %}
 {% block body %}
-  <h2>Gutschein eingelöst</h2>
+  <h2>Gutschein</h2>
   <ul>
   	<li>Code: {{ voucher.code }}
   	<li>Gültig: {{ 'ja' if voucher.valid else 'nein' }}
