@@ -86,6 +86,8 @@ class ShopItem(db.Model):
     name = db.Column(db.String(150))
     price = db.Column(db.Integer, nullable=False, default=0)
     image = db.Column(db.String(200))
+    category = db.Column(db.Integer, nullable=False)
+
 
 def update_sums_and_balances(app, session, instances):
     """Handler for updating bill sum and user balance"""
