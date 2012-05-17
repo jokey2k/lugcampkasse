@@ -174,7 +174,7 @@ def new_bill(code):
                 billentry = BillEntry(name=item.name, price=-item.price, bill=bill)
                 db.session.add(billentry)
             db.session.commit()
-            return redirect(url_for('nextcustomer'))
+            return redirect(url_for('show_balance', code=user.code))
         except ValueError:
             flash("Error during bill creation, only provide integers!")
     items = ShopItem.query.order_by(ShopItem.category).all()
