@@ -1,7 +1,7 @@
 (function() {
   var global = this;
 
-  var jug = new Juggernaut();
+  var jug = new Juggernaut({secure:true});
 
   var lib = global.lugcampkasse = {
     urlRoot : '/',
