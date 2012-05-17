@@ -205,7 +205,10 @@ def nextcustomer():
 @app.route('/cashier/signin', methods=['POST', ])
 def signin():
     user = User.query.filter_by(code=request.form['code']).first_or_404()
-    session['cashier'] = user.id
+    if request.method == "POST" and request.form['password'] == app.config['CASHIER_PASSWORD']:
+        session['cashier'] = user.id
+    else:
+        flash("Login failed")
     return redirect(url_for('show_balance', code=user.code))
 
 @app.route('/cashier/signout')
