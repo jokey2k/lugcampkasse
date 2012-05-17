@@ -36,7 +36,7 @@
 
     subscribeNewCustomer : function(cashierCode) {
       jug.subscribe('new-customer:' + cashierCode, function(data) {
-        window.location = "/" + data.code;
+        window.location = "/" + data.code + "/new_bill";
       });
     },
 
