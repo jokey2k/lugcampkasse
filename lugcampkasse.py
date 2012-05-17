@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import ifilter
-
+import math
 from juggernaut import Juggernaut
 
 from flask import Flask, request, url_for, redirect, g, session, flash, \
@@ -153,13 +153,15 @@ def usercode(code):
 def show_balance(code, page):
     user = User.query.filter_by(code=code).first_or_404()
     pagination = Bill.query.filter_by(user=user).paginate(page)
-    return render_template('balance.html', user=user, pagination=pagination)
+    flens = math.floor(user.balance/70)
+    return render_template('balance.html', user=user, pagination=pagination, flens=flens)
 
 @app.route('/<string(length=6):code>/bill/<int:bill_id>')
 def show_bill(code, bill_id):
     user = User.query.filter_by(code=code).first_or_404()
     bill = Bill.query.filter_by(user=user).filter_by(id=bill_id).first_or_404()
-    return render_template('show_bill.html', bill=bill)
+    flens = math.floor(bill.user.balance/70)
+    return render_template('show_bill.html', bill=bill, flens=flens)
 
 @app.route('/<string(length=6):code>/new_bill', methods=['GET', 'POST'])
 def new_bill(code):
@@ -193,7 +195,8 @@ def cancel_item(usercode,bill_id,item_id):
         db.session.remove(item)
         flash("removed item %s from bill %i" % (item.name, bill.id))
         db.session.commit()
-        return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
+	flens = math.floor(bill.user.balance/70)
+        return redirect(url_for('show_bill', code=user.code, bill_id=bill_id, flens=flens))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 	
 
