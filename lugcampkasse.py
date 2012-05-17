@@ -161,6 +161,25 @@ def show_bill(code, bill_id):
     bill = Bill.query.filter_by(user=user).filter_by(id=bill_id).first_or_404()
     return render_template('show_bill.html', bill=bill)
 
+@app.route('/<string(length=6):code>/new_bill', methods=['GET', 'POST'])
+def new_bill(code):
+    user = User.query.filter_by(code=code).first_or_404()
+    if request.method == "POST":
+        try:
+            bill_ids = request.form['bill_ids'].split(",")
+            bill = Bill(user=user)
+            db.session.add(bill)
+            for bill_id in bill_ids:
+                item = ShopItem.query.get(int(bill_id))
+                billentry = BillEntry(name=item.name, price=-item.price, bill=bill)
+                db.session.add(billentry)
+            db.session.commit()
+            return redirect(url_for('nextcustomer'))
+        except ValueError:
+            flash("Error during bill creation, only provide integers!")
+    items = ShopItem.query.order_by(ShopItem.category).all()
+    return render_template('new_bill.html', user=user, items=items)
+
 @app.route('/<string(length=6):usercode>/voucher', methods=['GET', 'POST'])
 def redeem_voucher(usercode):
     if not g.cashier:

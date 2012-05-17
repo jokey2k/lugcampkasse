@@ -7,6 +7,8 @@ a:hover       { color: #c00; }
 .nav          { margin: 0 0 20px 0; list-style: none; padding: 0; }
 .nav li       { display: inline; }
 .nav li + li:before { content: " // "; }
+.shoplist          { float:left; margin: 0 20px 20px 20px; list-style: none; padding: 0; }
+.shoplist li       { display: block; }
 h2            { font-weight: normal; margin: 0; }
 dl            { overflow: auto; font-size: 14px; }
 dl dt         { font-weight: bold; width: 90px; float: left;
@@ -19,3 +21,4 @@ textarea      { border: none; width: 720px; }
 .pagination strong,
 .pagination span.ellipsis,
 .pagination a { border: 1px solid #d00; padding: 2px 6px; text-decoration: none; }
+h2#summe { clear:both; }

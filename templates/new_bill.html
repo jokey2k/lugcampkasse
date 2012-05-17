@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}GetränkeBar - Neue Rechnung{% endblock %}
+{% block body %}
+  <h2>Aktueller Kontostand</h2>
+  <ul>
+  	<li>Name: {{ user.name }}
+  	<li>LUG: {{ user.lug }}
+  	<li>Aktueller Kontostand: {{ "%6.2f"|format(user.balance/100) }} EUR
+  </ul>
+  <div class=shopitem>
+    <h2>Buchen</h2>
+    {% for grouper, list in items|groupby('category') %}
+    <ul class=shoplist>
+      {% for item in list %}
+        <li><a onClick="lugcampkasse.addToBill({{ item.id }}, '{{ item.name }}', {{ item.price }})">{{ item.name }} ({{ "%6.2f"|format(item.price/100) }} EUR)</a>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+    <h2 id=summe>Bereits Gebucht (<span id=summe>0.00</span> EUR)</h2>
+    <form action="{{ url_for('new_bill', code=user.code) }}" method=POST>
+      <input id=bill_ids type=hidden name="bill_ids" value="">
+      <input type=submit value="Rechnung speichern">
+    </form>
+    <ul id=billed>
+    </ul>
+  </div>
+{% endblock %}
