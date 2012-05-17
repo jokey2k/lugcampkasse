@@ -27,7 +27,7 @@
   <script type=text/javascript>
     lugcampkasse.subscribeUpdatedBalance("{{ user.code }}");
   {% if g.cashier %}
-    window.setTimeout("window.location={{ url_for('nextcustomer') }}", 15000);
+    window.setTimeout("window.location='{{ url_for('nextcustomer') }}'", 15000);
   {% endif %}
   </script>
 {% endblock %}
