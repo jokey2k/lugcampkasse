@@ -213,8 +213,9 @@ def signin():
 
 @app.route('/cashier/signout')
 def signout():
+    code = g.cashier.code
     session.clear()
-    return redirect(url_for('show_balance', code=g.cashier.code))
+    return redirect(url_for('show_balance', code=code))
 
 @app.route('/voucher/<string(length=12):code>')
 def vouchercode(code):
