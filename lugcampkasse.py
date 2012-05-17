@@ -195,13 +195,12 @@ def cancel_item(usercode,bill_id,item_id):
     if bill != item.bill:
 	abort(403)
     if request.method == "POST":
-        db.session.remove(item)
-        flash("removed item %s from bill %i" % (item.name, bill.id))
+        db.session.delete(item)
+        flash("Removed item %s from bill %i" % (item.name, bill.id))
         db.session.commit()
 	flens = math.floor(bill.user.balance/70)
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id, flens=flens))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
-	
 
 @app.route('/<string(length=6):usercode>/voucher', methods=['GET', 'POST'])
 def redeem_voucher(usercode):
