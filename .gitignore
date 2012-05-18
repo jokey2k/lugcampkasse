@@ -4,3 +4,8 @@ build
 dist
 *.sqlite
 .DS_Store
+/lib/*
+/bin/*
+/include/*
+/local/
+*~
