@@ -51,6 +51,14 @@ class User(db.Model):
     lug = db.Column(db.String(100))
     balance = db.Column(db.Integer, nullable=False, default=0)
     allowed_cashier = db.Column(db.Boolean, default=False)
+    blocked = db.Column(db.Boolean, default=False, nullable=False)
+
+    @staticmethod
+    def get_by_code(code):
+        user = User.query.filter(User.code==code).first_or_404()
+        if user.blocked:
+            abort(403)
+        return user
 
     def update_balance(self):
         self.balance = sum([bill.accumulated_price for bill in self.bills])
