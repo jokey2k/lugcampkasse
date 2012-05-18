@@ -148,7 +148,7 @@ def usercode(code):
             send_new_customer_notification(g.cashier.code, code)
             user = User.query.filter_by(code=code).first_or_404()
             return render_template('new_customer_notification.html', disable_navigation=True, user=user)
-        return render_template(url_for('new_bill', code=code))
+        return redirect(url_for('new_bill', code=code))
 
     return redirect(url_for('show_balance', code=code))
 
