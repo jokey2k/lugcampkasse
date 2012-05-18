@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}GetränkeBar - Rechnung{% endblock %}
 {% from '_pagination.html' import render_pagination %}
+{% from '_balance.html' import balance_for_user %}
 {% block body %}
   <h2>Aktueller Kontostand</h2>
   <ul>
   	<li>Name: {{ bill.user.name }}
   	<li>LUG: {{ bill.user.lug }}
-  	<li>Aktueller Kontostand: <span class="{% if bill.user.balance > 70 %}green{% else %}red{% endif %}">{{ "%6.2f"|format(bill.user.balance/100) }}</span> EUR 
-	{% if flens > 0 %} (reicht noch für {{ flens }} Flens) {% endif %}
+  	<li>Aktueller Kontostand: {{ balance_for_user(bill.user) }}
   </ul>
   <h2>GetränkeBar</h2>
   <ul>

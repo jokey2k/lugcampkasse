@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from '_balance.html' import balance_for_user %}
 {% block title %}Gutschein eingelöst{% endblock %}
 {% block body %}
   <h2>Gutschein eingelöst</h2>
@@ -12,7 +13,7 @@
   <ul>
     <li>Name: {{ user.name }}
     <li>LUG: {{ user.lug }}
-    <li>Aktueller Kontostand: <span id=balance>{{ "%6.2f"|format(user.balance/100) }}</span> EUR
+    <li>Aktueller Kontostand: {{ balance_for_user(user) }}
   </ul>
   <script type=text/javascript>
   lugcampkasse.subscribeNewCustomer("{{ g.cashier.code }}");

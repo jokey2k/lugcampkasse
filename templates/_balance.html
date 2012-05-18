@@ -1,0 +1,11 @@
+{% macro balance_for_user(user) %}
+{% if user.balance > 0%}
+	<span class="green">
+{% elif user.balance == 0 %}
+	<span>
+{% else %}
+	<span class="red">
+{% endif %}
+{{ "%.2f"|format(user.balance/100) }}</span> EUR 
+{% if (user.balance/70) > 0 %}(reicht noch für {{ (user.balance/70)|int }} Flens){% endif %}
+{% endmacro %}

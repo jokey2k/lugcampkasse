@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
+{% from '_balance.html' import balance_for_user %}
 {% block title %}GetränkeBar - Neue Rechnung{% endblock %}
 {% block body %}
   <h2>Aktueller Kontostand</h2>
   <ul>
   	<li>Name: {{ user.name }}
   	<li>LUG: {{ user.lug }}
-  	<li>Aktueller Kontostand: {{ "%6.2f"|format(user.balance/100) }} EUR
+  	<li>Aktueller Kontostand: {{ balance_for_user(user) }}
   </ul>
   <div class=shopitem>
     <h2>Buchen</h2>

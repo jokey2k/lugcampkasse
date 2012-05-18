@@ -22,5 +22,5 @@ textarea      { border: none; width: 720px; }
 .pagination span.ellipsis,
 .pagination a { border: 1px solid #d00; padding: 2px 6px; text-decoration: none; }
 h2#summe { clear:both; }
-.green        { color: #00FF00; }
-.red          { color: #FF0000; }
+.green        { color: #090; }
+.red          { color: #c00; }

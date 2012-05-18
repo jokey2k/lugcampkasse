@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}Kontostand{% endblock %}
 {% from '_pagination.html' import render_pagination %}
+{% from '_balance.html' import balance_for_user %}
 {% block body %}
   <h2>Aktueller Kontostand</h2>
   <ul>
   	<li>Name: {{ user.name }}
   	<li>LUG: {{ user.lug }}
-  	<li>Aktueller Kontostand: <span id=balance>{{ "%6.2f"|format(user.balance/100) }}</span> EUR (reicht noch für {{ flens }} Flens ) <span id=liveupdated></span>
+    <li>Aktueller Kontostand: {{ balance_for_user(user) }}
   </ul>
   <h2 class=bills>GetränkeBar</h2>
   <ul class=bills>
