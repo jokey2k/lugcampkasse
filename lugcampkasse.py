@@ -231,6 +231,23 @@ def redeem_voucher(usercode):
             flash("No such voucher")
     return render_template("redeem_voucher.html", user=user)
 
+@app.route('/<string(length=6):usercode>/quick_payment', methods=['GET', 'POST'])
+def quick_payment(usercode):
+    if not g.cashier:
+        return redirect(url_for('show_balance', code=usercode))
+    user = User.query.filter_by(code=usercode).first_or_404()
+    if request.method == "POST":
+        if 'amount' in request.form:
+            value = int(request.form['amount']) or 0
+            bill = Bill(user=user)
+            billentry = BillEntry(name="Einzahlung", price=value, bill=bill)
+            db.session.add(billentry)
+            db.session.add(bill)
+            db.session.commit()
+            flash("Konto aufgeladen mit %.2f EUR" % (value/100))
+            return redirect(url_for('new_bill', code=user.code))
+    return render_template('quick_payment.html', user=user)
+
 @app.route('/cashier/devices', methods=['GET', 'POST'])
 def devices():
     if not g.cashier:

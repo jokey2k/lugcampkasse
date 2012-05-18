@@ -24,3 +24,4 @@ textarea      { border: none; width: 720px; }
 h2#summe { clear:both; }
 .green        { color: #090; }
 .red          { color: #c00; }
+.quickpay     { margin: 0 15px 0 15px; font-size: 20px; }
