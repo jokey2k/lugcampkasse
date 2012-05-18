@@ -145,6 +145,10 @@ def set_request_environment():
     if 'scan_device' not in session:
         session['scan_device'] = False
 
+@app.errorhandler(403)
+def access_denied(e):
+    return render_template('error403.html'), 403
+
 @app.errorhandler(404)
 def access_denied(e):
     return render_template('error404.html'), 404
