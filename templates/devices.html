@@ -10,4 +10,8 @@
   	<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
   	<input type=submit value="{{ 'Deaktivieren' if is_scan_device else 'Aktivieren' }}">
   </form>
+  <br>
+  <h2>Konto von {{ g.cashier.name }}</h2>
+  <p><a href="{{ url_for('show_balance', code=g.cashier.code) }}">Kontostand</a>
+  <p><a href="{{ url_for('new_bill', code=g.cashier.code) }}">Neue Rechnung</a>
 {% endblock %}
