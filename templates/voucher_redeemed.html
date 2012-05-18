@@ -9,12 +9,7 @@
     <li>Eingelöst: {{ 'ja' if voucher.redeemed else 'nein' }}
     <li>Wert: {{ "%6.2f"|format(voucher.value/100) }} EUR
   </ul>
-  <h2>Neuer Kontostand</h2>
-  <ul>
-    <li>Name: {{ user.name }}
-    <li>LUG: {{ user.lug }}
-    <li>Aktueller Kontostand: {{ balance_for_user(user) }}
-  </ul>
+  {{ balance_for_user(user) }}
   <script type=text/javascript>
   lugcampkasse.subscribeNewCustomer("{{ g.cashier.code }}");
   </script>

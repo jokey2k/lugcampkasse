@@ -2,12 +2,7 @@
 {% from '_balance.html' import balance_for_user %}
 {% block title %}GetränkeBar - Neue Rechnung{% endblock %}
 {% block body %}
-  <h2>Aktueller Kontostand</h2>
-  <ul>
-  	<li>Name: {{ user.name }}
-  	<li>LUG: {{ user.lug }}
-  	<li>Aktueller Kontostand: {{ balance_for_user(user) }}
-  </ul>
+  {{ balance_for_user(user) }}
   <div class=shopitem>
     <h2>Buchen</h2>
     {% for grouper, list in items|groupby('category') %}

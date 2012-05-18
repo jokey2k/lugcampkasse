@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}Gutschein eingelöst{% endblock %}
+{% from '_balance.html' import balance_for_user %}
 {% block body %}
   <h2>Gutschein einlösen</h2>
   <form action="{{ url_for('redeem_voucher', usercode=user.code) }}" method=POST>
@@ -7,12 +8,7 @@
     <input id=vouchercodefield type=text name=vouchercode>
     <input type=submit value="Entwerten">
   </form>
-  <h2>Aufbuchen auf Konto von</h2>
-  <ul>
-    <li>Name: {{ user.name }}
-    <li>LUG: {{ user.lug }}
-    <li>Kontostand: <span id=balance>{{ "%6.2f"|format(user.balance/100) }}</span> EUR
-  </ul>
+  {{ balance_for_user(user) }}
   <script type=text/javascript>
   lugcampkasse.subscribeScannedVoucher("{{ g.cashier.code }}");
   </script>

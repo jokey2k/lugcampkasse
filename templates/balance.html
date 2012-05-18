@@ -3,12 +3,7 @@
 {% from '_pagination.html' import render_pagination %}
 {% from '_balance.html' import balance_for_user %}
 {% block body %}
-  <h2>Aktueller Kontostand</h2>
-  <ul>
-  	<li>Name: {{ user.name }}
-  	<li>LUG: {{ user.lug }}
-    <li>Aktueller Kontostand: {{ balance_for_user(user) }}
-  </ul>
+  {{ balance_for_user(user) }}
   <h2 class=bills>GetränkeBar</h2>
   <ul class=bills>
   {% for bill in pagination.items %}

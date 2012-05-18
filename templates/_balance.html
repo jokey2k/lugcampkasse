@@ -1,4 +1,9 @@
 {% macro balance_for_user(user) %}
+  <h2>Aktueller Kontostand</h2>
+  <ul>
+  	<li>Name: {{ user.name }}
+  	<li>LUG: {{ user.lug }}
+  	<li>Aktueller Kontostand:
 {% if user.balance > 0%}
 	<span class="green">
 {% elif user.balance == 0 %}
@@ -8,4 +13,5 @@
 {% endif %}
 {{ "%.2f"|format(user.balance/100) }}</span> EUR 
 {% if (user.balance/70) > 0 %}(reicht noch für {{ (user.balance/70)|int }} Flens){% endif %}
+  </ul>
 {% endmacro %}
