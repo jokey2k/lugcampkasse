@@ -148,6 +148,7 @@ def usercode(code):
             send_new_customer_notification(g.cashier.code, code)
             user = User.query.filter_by(code=code).first_or_404()
             return render_template('new_customer_notification.html', disable_navigation=True, user=user)
+        return render_template(url_for('new_bill', code=code))
 
     return redirect(url_for('show_balance', code=code))
 
@@ -156,14 +157,14 @@ def usercode(code):
 def show_balance(code, page):
     user = User.query.filter_by(code=code).first_or_404()
     pagination = Bill.query.filter_by(user=user).paginate(page)
-    flens = math.floor(user.balance/70)
+    flens = int(math.floor(user.balance/70))
     return render_template('balance.html', user=user, pagination=pagination, flens=flens)
 
 @app.route('/<string(length=6):code>/bill/<int:bill_id>')
 def show_bill(code, bill_id):
     user = User.query.filter_by(code=code).first_or_404()
     bill = Bill.query.filter_by(user=user).filter_by(id=bill_id).first_or_404()
-    flens = math.floor(bill.user.balance/70)
+    flens = int(math.floor(bill.user.balance/70))
     return render_template('show_bill.html', bill=bill, flens=flens)
 
 @app.route('/<string(length=6):code>/new_bill', methods=['GET', 'POST'])
@@ -197,8 +198,12 @@ def cancel_item(usercode,bill_id,item_id):
     if request.method == "POST":
         db.session.delete(item)
         flash("Removed item %s from bill %i" % (item.name, bill.id))
+        if len(bill.accumulated_items) == 0:
+            db.session.delete(bill)
+            user.update_balance()
+            flash("Removed whole bill %i" % (bill.id))
         db.session.commit()
-	flens = math.floor(bill.user.balance/70)
+	flens = int(math.floor(bill.user.balance/70))
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id, flens=flens))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
