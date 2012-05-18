@@ -194,7 +194,7 @@ def cancel_item(usercode,bill_id,item_id):
     bill = Bill.query.get(bill_id)
     item = BillEntry.query.get(item_id)
     if bill != item.bill:
-	abort(403)
+        abort(403)
     if request.method == "POST":
         db.session.delete(item)
         flash("Removed item %s from bill %i" % (item.name, bill.id))
@@ -203,7 +203,7 @@ def cancel_item(usercode,bill_id,item_id):
             user.update_balance()
             flash("Removed whole bill %i" % (bill.id))
         db.session.commit()
-	flens = int(math.floor(bill.user.balance/70))
+        flens = int(math.floor(bill.user.balance/70))
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id, flens=flens))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
