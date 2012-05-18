@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
-{% block title %}Gutschein eingelöst{% endblock %}
 {% from '_balance.html' import balance_for_user %}
+{% block title %}Gutschein einlösen{% endblock %}
 {% block body %}
   <h2>Gutschein einlösen</h2>
   <form action="{{ url_for('redeem_voucher', usercode=user.code) }}" method=POST>
