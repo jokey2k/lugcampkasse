@@ -6,7 +6,8 @@
   <ul>
   	<li>Name: {{ bill.user.name }}
   	<li>LUG: {{ bill.user.lug }}
-  	<li>Aktueller Kontostand: {{ "%6.2f"|format(bill.user.balance/100) }} EUR (reicht noch für {{ flens }} Flens)
+  	<li>Aktueller Kontostand: <span class="{% if bill.user.balance > 70 %}green{% else %}red{% endif %}">{{ "%6.2f"|format(bill.user.balance/100) }}</span> EUR 
+	{% if flens > 0 %} (reicht noch für {{ flens }} Flens) {% endif %}
   </ul>
   <h2>GetränkeBar</h2>
   <ul>
