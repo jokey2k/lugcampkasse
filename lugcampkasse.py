@@ -203,8 +203,7 @@ def cancel_item(usercode,bill_id,item_id):
             user.update_balance()
             flash("Removed whole bill %i" % (bill.id))
         db.session.commit()
-        flens = int(math.floor(bill.user.balance/70))
-        return redirect(url_for('show_bill', code=user.code, bill_id=bill_id, flens=flens))
+        return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
 @app.route('/<string(length=6):usercode>/voucher', methods=['GET', 'POST'])
