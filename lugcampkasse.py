@@ -145,6 +145,10 @@ def set_request_environment():
     if 'scan_device' not in session:
         session['scan_device'] = False
 
+@app.errorhandler(404)
+def access_denied(e):
+    return render_template('error404.html'), 404
+
 @app.route('/<string(length=6):code>')
 def usercode(code):
     """Request from User to show balance or from cashier to change to User"""
