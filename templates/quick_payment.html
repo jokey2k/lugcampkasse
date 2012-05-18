@@ -3,7 +3,7 @@
 {% block title %}Guthaben aufbuchen{% endblock %}
 {% block body %}
   <h2>Guthaben aufbuchen</h2>
-  <form action="{{ url_for('quick_payment', usercode=user.code) }}" method=POST>
+  <form action="{{ url_for('quick_payment', code=user.code) }}" method=POST>
     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
     <h3>Betrag wählen</h3>
     <a class=quickpay onClick="$('input#payment_amount')[0].value=500;document.forms[0].submit();">5 EUR</a>

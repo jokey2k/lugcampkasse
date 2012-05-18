@@ -3,7 +3,7 @@
 {% block body %}
   <div class=shopitem>
     <h2>Posten stornieren</h2>
-    <form action="{{ url_for('cancel_item', usercode=user.code, bill_id=bill.id, item_id=item.id) }}" method=POST>
+    <form action="{{ url_for('cancel_item', code=user.code, bill_id=bill.id, item_id=item.id) }}" method=POST>
       <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
       Soll {{ item.name }} von Rechnung #{{ bill.id }} von {{ user.name }} storniert werden?
       <input type=submit value="Posten stornieren">

@@ -154,7 +154,7 @@ def usercode(code):
             return redirect(url_for('devices', disable_navigation=True, ownercode=g.cashier.code))
         if session['scan_device']:
             send_new_customer_notification(g.cashier.code, code)
-            user = User.query.filter_by(code=code).first_or_404()
+            user = User.get_by_code(code)
             return render_template('new_customer_notification.html', disable_navigation=True, user=user)
         return redirect(url_for('new_bill', code=code))
 
@@ -163,21 +163,21 @@ def usercode(code):
 @app.route('/<string(length=6):code>/balance/', defaults={'page': 1})
 @app.route('/<string(length=6):code>/balance/page/<int:page>')
 def show_balance(code, page):
-    user = User.query.filter_by(code=code).first_or_404()
+    user = User.get_by_code(code)
     pagination = Bill.query.filter_by(user=user).paginate(page)
     flens = int(math.floor(user.balance/70))
     return render_template('balance.html', user=user, pagination=pagination, flens=flens)
 
 @app.route('/<string(length=6):code>/bill/<int:bill_id>')
 def show_bill(code, bill_id):
-    user = User.query.filter_by(code=code).first_or_404()
+    user = User.get_by_code(code)
     bill = Bill.query.filter_by(user=user).filter_by(id=bill_id).first_or_404()
     flens = int(math.floor(bill.user.balance/70))
     return render_template('show_bill.html', bill=bill, flens=flens)
 
 @app.route('/<string(length=6):code>/new_bill', methods=['GET', 'POST'])
 def new_bill(code):
-    user = User.query.filter_by(code=code).first_or_404()
+    user = User.get_by_code(code)
     if request.method == "POST":
         try:
             bill_ids = request.form['bill_ids'].split(",")
@@ -194,11 +194,11 @@ def new_bill(code):
     items = ShopItem.query.order_by(ShopItem.category).all()
     return render_template('new_bill.html', user=user, items=items)
 
-@app.route('/<string(length=6):usercode>/bill/<int:bill_id>/cancel_item/<int:item_id>', methods=['GET', 'POST'])
-def cancel_item(usercode,bill_id,item_id):
+@app.route('/<string(length=6):code>/bill/<int:bill_id>/cancel_item/<int:item_id>', methods=['GET', 'POST'])
+def cancel_item(code,bill_id,item_id):
     if not g.cashier:
         abort(403)
-    user = User.query.filter_by(code=usercode).first_or_404()
+    user = User.get_by_code(code)
     bill = Bill.query.get(bill_id)
     item = BillEntry.query.get(item_id)
     if bill != item.bill:
@@ -214,11 +214,11 @@ def cancel_item(usercode,bill_id,item_id):
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
-@app.route('/<string(length=6):usercode>/voucher', methods=['GET', 'POST'])
-def redeem_voucher(usercode):
+@app.route('/<string(length=6):code>/voucher', methods=['GET', 'POST'])
+def redeem_voucher(code):
     if not g.cashier:
         abort(403)
-    user = User.query.filter_by(code=usercode).first_or_404()
+    user = User.get_by_code(code)
     if request.method == "POST":
         voucher = Voucher.query.filter_by(code=request.form['vouchercode']).first()
         if voucher:
@@ -238,11 +238,11 @@ def redeem_voucher(usercode):
             flash("No such voucher")
     return render_template("redeem_voucher.html", user=user)
 
-@app.route('/<string(length=6):usercode>/quick_payment', methods=['GET', 'POST'])
-def quick_payment(usercode):
+@app.route('/<string(length=6):code>/quick_payment', methods=['GET', 'POST'])
+def quick_payment(code):
     if not g.cashier:
-        return redirect(url_for('show_balance', code=usercode))
-    user = User.query.filter_by(code=usercode).first_or_404()
+        return redirect(url_for('show_balance', code=code))
+    user = User.get_by_code(code)
     if request.method == "POST":
         if 'amount' in request.form:
             value = int(request.form['amount']) or 0
@@ -252,7 +252,7 @@ def quick_payment(usercode):
             db.session.add(bill)
             db.session.commit()
             flash("Konto aufgeladen mit %.2f EUR" % (value/100))
-            return redirect(url_for('new_bill', code=user.code))
+            return redirect(url_for('new_bill', code=code))
     return render_template('quick_payment.html', user=user)
 
 @app.route('/cashier/devices', methods=['GET', 'POST'])

@@ -21,8 +21,8 @@
     <li><a href="{{ url_for('nextcustomer') }}">Nächster Kunde</a>
     {% if g.cashier and user %}
     <li><a href="{{ url_for('new_bill', code=user.code) }}">Neue Rechnung</a>
-    <li><a href="{{ url_for('redeem_voucher', usercode=user.code) }}">Gutschein einlösen</a>
-    <li><a href="{{ url_for('quick_payment', usercode=user.code) }}">Guthaben aufbuchen</a>
+    <li><a href="{{ url_for('redeem_voucher', code=user.code) }}">Gutschein einlösen</a>
+    <li><a href="{{ url_for('quick_payment', code=user.code) }}">Guthaben aufbuchen</a>
     {% endif %}
     <li><a href="{{ url_for('signout') }}">Abmelden</a>
     {% endif %}

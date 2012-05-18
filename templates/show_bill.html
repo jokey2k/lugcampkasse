@@ -10,7 +10,7 @@
     <li>{{ entry.name }}
     <li>{{ "%6.2f"|format(entry.price/100) }} EUR
     {% if g.cashier %}
-        <a href="{{ url_for('cancel_item', usercode=bill.user.code, bill_id=bill.id, item_id=entry.id) }}">Storno</a>
+        <a href="{{ url_for('cancel_item', code=bill.user.code, bill_id=bill.id, item_id=entry.id) }}">Storno</a>
     {% endif %}
   {% endfor %}
   </ul>
