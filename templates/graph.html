@@ -3,20 +3,26 @@
 {% extends "layout.html" %}
 {% block title %}Graph{% endblock %}
 {% block body %}
-  <table id="data" data-target="#graph-target">
+  <table id="data" data-graph-target="#graph-target">
     <tbody>
 
       {% for hour in sellings %}
         <tr>
           <th>{{ hour }}</th>
-          <td>{{ sellings[hour] }}</td>
+          {% for product in sellings[hour] %}
+            <td>{{ sellings[hour][product] }}</td>
+          {% endfor %}
         </tr>
       {% endfor %}
 
     </tbody>
   </table>
-  <div id="graph-target" data-height="400" data-width="900"></div>
-
-  <script src="{{ url_for('static', filename='raphael.js') }}"></script>
-  <script src="{{ url_for('static', filename='graph.js') }}"></script>
+  <div id="graph-target" style="width: 800px; height: 400px;"></div>
+  <div>
+    <h3>Legende</h3>
+    <ul>
+      <li style="color:#aaaa00">Flens</li>
+      <li style="color:#aa0000;">Anderes</li>
+    </ul>
+  </div>
 {% endblock %}
