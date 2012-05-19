@@ -1,7 +1,7 @@
 (function() {
   var global = this;
 
-  var jug = new Juggernaut({secure:true});
+  var jug = new Juggernaut({secure:false});
 
   var lib = global.lugcampkasse = {
     urlRoot : '/',
@@ -70,5 +70,14 @@
   $(function() {
     /* animate the server side flashes a bit */
     lib.autoHideFlashes();
+
+    $('#data').graphy(
+      { colors: ['#dd0000', '#dddd00'], yaxis: { label: ' asd' }, xaxis: {mode: "time"}, series: {stack: true, lines: { show: true, fill: true}} },
+      function(plot, plotData) {
+        jug.subscribe('new-bill', function(data) {
+          window.location.reload();
+        })
+      }
+    );
   });
 })();
