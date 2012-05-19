@@ -196,6 +196,10 @@ def new_bill(code):
                 billentry = BillEntry(name=item.name, price=-item.price, bill=bill)
                 db.session.add(billentry)
             db.session.commit()
+            data = {
+                'items': len(bill_ids)
+            }
+            jug.publish('new-bill', data)
             return redirect(url_for('show_balance', code=user.code))
         except ValueError:
             flash("Error during bill creation, only provide integers!")
@@ -296,20 +300,27 @@ def signout():
     return redirect(url_for('show_balance', code=code))
 
 @app.route('/graph/all')
-def graphing():
+def graph_all():
+    entries = BillEntry.query.all()
+
     sellings = {}
 
     for i in range(0, 72):
-      sellings[i]=0
-
-    entries = BillEntry.query.all()
+        sellings[i] = {
+            'all':0,
+            'flens': 0
+        }
 
     for entry in entries:
-      key = entry.bill.created.hour + (entry.bill.created.day-17) * 24
+        key = entry.bill.created.hour + (entry.bill.created.day-17) * 24
 
-      if key in sellings:
-        old = sellings[key]
-        sellings[key] = old + 1
+        if entry.name.find('Flens') > -1:
+            product = 'flens'
+        else:
+            product = 'all'
+
+        if key in sellings:
+            sellings[key][product] += 1
 
     return render_template("graph.html", sellings=sellings)
 
