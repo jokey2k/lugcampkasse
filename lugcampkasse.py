@@ -296,7 +296,7 @@ def signout():
     return redirect(url_for('show_balance', code=code))
 
 @app.route('/graph/all')
-def signout():
+def graphing():
     sellings = {}
 
     for i in range(0, 72):
