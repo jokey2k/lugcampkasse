@@ -9,6 +9,7 @@ a:hover       { color: #c00; }
 .nav li + li:before { content: " // "; }
 .shoplist          { float:left; margin: 0 20px 20px 20px; list-style: none; padding: 0; }
 .shoplist li       { display: block; font-size: 20px; padding: 3px 0 3px 0; }
+.shoplist a   { cursor: pointer; }
 h2            { font-weight: normal; margin: 0; }
 dl            { overflow: auto; font-size: 14px; }
 dl dt         { font-weight: bold; width: 90px; float: left;
