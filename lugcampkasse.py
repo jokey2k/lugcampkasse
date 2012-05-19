@@ -295,6 +295,25 @@ def signout():
     session.clear()
     return redirect(url_for('show_balance', code=code))
 
+@app.route('/graph/all')
+def signout():
+    sellings = {}
+
+    for i in range(0, 72):
+      sellings[i]=0
+
+    entries = BillEntry.query.all()
+
+    for entry in entries:
+      key = entry.bill.created.hour + (entry.bill.created.day-17) * 24
+
+      if key in sellings:
+        old = sellings[key]
+        sellings[key] = old + 1
+
+    return render_template("graph.html", sellings=sellings)
+
+
 @app.route('/voucher/<string(length=12):code>')
 def vouchercode(code):
     voucher = Voucher.query.filter_by(code=code).first()
