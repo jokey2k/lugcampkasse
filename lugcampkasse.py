@@ -214,11 +214,13 @@ def cancel_item(code,bill_id,item_id):
     if request.method == "POST":
         db.session.delete(item)
         flash("Removed item %s from bill %i" % (item.name, bill.id))
-        if len(bill.accumulated_items) == 0:
+        db.session.commit()
+        if len(bill.entries) == 0:
             db.session.delete(bill)
             user.update_balance()
             flash("Removed whole bill %i" % (bill.id))
-        db.session.commit()
+            db.session.commit()
+            return redirect(url_for('show_balance',code=user.code))
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
