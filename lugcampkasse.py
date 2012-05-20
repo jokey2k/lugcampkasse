@@ -307,7 +307,7 @@ def graph_all():
 
     sellings = {}
 
-    for i in range(0, 72):
+    for i in range(0, 96):
         sellings[i] = {
             'all':0,
             'flens': 0
