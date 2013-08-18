@@ -14,8 +14,9 @@ from sqlalchemy import event as sqla_event
 from sqlalchemy.sql.expression import func as sqla_func
 from sqlalchemy.orm.interfaces import SessionExtension, EXT_CONTINUE
 
-# App definiton
-
+#
+# Flask app definiton
+#
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 jug = Juggernaut()
@@ -29,7 +30,9 @@ def url_for_other_page(page):
     return url_for(request.endpoint, **args)
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
-# create custom signals
+#
+# Blinker custom signals
+#
 signals = Namespace()
 before_flush = signals.signal('models-before-flush')
 
@@ -40,10 +43,14 @@ class FlushSignalExtension(SessionExtension):
         before_flush.send(session.app, session=session, instances=instances)
         return EXT_CONTINUE
 
-
+#
+# SQLAlchemy setup
+#
 db = SQLAlchemy(app, session_extensions=[FlushSignalExtension()])
 
+#
 # Data Model
+#
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(6))
@@ -113,10 +120,11 @@ def update_sums_and_balances(app, session, instances):
         predicate = lambda s: isinstance(s, Bill)
         for entry in ifilter(predicate, session_changed):
             entry.user.update_balance()
-
 before_flush.connect(update_sums_and_balances)
 
-# cashier and user notification helpers
+#
+# Event notification broadcast
+#
 def send_updated_balance_notification(user):
     """Notifies clients about updated balance"""
 
@@ -136,7 +144,9 @@ def send_redeem_voucher_notification(cashier_code, voucher_code):
     data = {'code': voucher_code}
     jug.publish('scanned-voucher:%s' % cashier_code, data)
 
-# view functions
+#
+# Custom request handlers
+#
 @app.before_request
 def set_request_environment():
     g.cashier = None
@@ -153,6 +163,9 @@ def access_denied(e):
 def access_denied(e):
     return render_template('error404.html'), 404
 
+#
+# Buying and display
+#
 @app.route('/<string(length=6):code>')
 def usercode(code):
     """Request from User to show balance or from cashier to change to User"""
@@ -228,6 +241,25 @@ def cancel_item(code,bill_id,item_id):
         return redirect(url_for('show_bill', code=user.code, bill_id=bill_id))
     return render_template('cancel_item.html', user=user, bill=bill, item=item)
 
+#
+# Voucher handling
+#
+@app.route('/voucher/<string(length=12):code>')
+def vouchercode(code):
+    voucher = Voucher.query.filter_by(code=code).first()
+    if voucher:
+        voucher.valid = True
+    else:
+        voucher = Voucher()
+        voucher.code = code
+        voucher.value = 0.0
+        voucher.valid = False
+
+    if voucher.valid and g.cashier and session['scan_device']:
+        send_redeem_voucher_notification(g.cashier.code, code)
+
+    return render_template("vouchercode.html", voucher=voucher)
+
 @app.route('/<string(length=6):code>/voucher', methods=['GET', 'POST'])
 def redeem_voucher(code):
     if not g.cashier:
@@ -269,6 +301,9 @@ def quick_payment(code):
             return redirect(url_for('new_bill', code=code))
     return render_template('quick_payment.html', user=user)
 
+#
+# Devices, scanning and events
+#
 @app.route('/cashier/devices', methods=['GET', 'POST'])
 def devices():
     if not g.cashier:
@@ -301,6 +336,9 @@ def signout():
     session.clear()
     return redirect(url_for('show_balance', code=code))
 
+#
+# Statistics
+#
 @app.route('/graph/all')
 def graph_all():
     entries = BillEntry.query.all()
@@ -326,19 +364,3 @@ def graph_all():
 
     return render_template("graph.html", sellings=sellings)
 
-
-@app.route('/voucher/<string(length=12):code>')
-def vouchercode(code):
-    voucher = Voucher.query.filter_by(code=code).first()
-    if voucher:
-        voucher.valid = True
-    else:
-        voucher = Voucher()
-        voucher.code = code
-        voucher.value = 0.0
-        voucher.valid = False
-
-    if voucher.valid and g.cashier and session['scan_device']:
-        send_redeem_voucher_notification(g.cashier.code, code)
-
-    return render_template("vouchercode.html", voucher=voucher)
