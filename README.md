@@ -8,7 +8,12 @@ Cash managing for soft drinks and junk food. Used at LUG Camp 2012.
   * Past bills
   * Voucher handling
   * Scanning codes with a second device
-    * To do that, just scan your cashier-allowed code, type in password, scan again and click "activate"
+    * Just scan your cashier-allowed code
+    * type in password
+    * scan again
+    * click "Activate"
+    * DONE! Your smartphone now sends the code to cashier device without further configuration
+    * YEY! It even works with multiple cashiers and devices
 
 **What you need beforehand**
 
