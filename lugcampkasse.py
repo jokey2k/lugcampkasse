@@ -49,7 +49,7 @@ class FlushSignalExtension(SessionExtension):
 #
 # SQLAlchemy setup
 #
-db = SQLAlchemy(app, {'session_extensions':[FlushSignalExtension()]})
+db = SQLAlchemy(app, {'session_extensions': [FlushSignalExtension(), ]})
 
 #
 # Data Model
