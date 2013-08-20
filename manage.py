@@ -34,26 +34,31 @@ def import_csv(csv_filename, init_db=False):
         for row in reader:
             # row containing user(data)
             if "usercode" in row and row["usercode"]:
-                users = User.query.filter(User.code==row['usercode'])
+                usercode = row["usercode"].strip()
+                users = User.query.filter(User.code==usercode).all()
                 if not users:
-                    user = User(code=row["usercode"])
-                    print "Created user for code %s" % user.code
+                    user = User(code=usercode)
+                    print "Created user for code %s" % usercode
                     db.session.add(user)
                 else:
                     user = users[0]
-                user.name = row['name']
-                user.lug = row['lug']
-                user.allowed_cashier = True if row['cashier'] else False
-                user.blocked = True if row['blocked'] else False
+                user.name = row['name'].strip()
+                user.lug = row['lug'].strip()
+                user.allowed_cashier = True if row['cashier'] == "1" else False
+                user.blocked = True if row['blocked'] == "1"  else False
 
                 if row["initialcredit"]:
+                    try:
+                        value = int(row["initialcredit"])
+                    except ValueError:
+                        value = 0
                     if value:
                         bill = Bill(user=user)
                         billentry = BillEntry(name="Initial credit", price=value, bill=bill)
                         db.session.add(billentry)
                         db.session.add(bill)
             elif "vouchercode" in row and row["vouchercode"]:
-                vouchers = Voucher.query.filter(Voucher.code==row['vouchercode'])
+                vouchers = Voucher.query.filter(Voucher.code==row['vouchercode']).all()
                 if not vouchers:
                     voucher = Voucher(code=row["vouchercode"])
                     print "Created voucher for code %s" % voucher.code
@@ -67,7 +72,7 @@ def import_csv(csv_filename, init_db=False):
                         value = 0
                     voucher.value = value
             elif "itemname" in row and row["itemname"]:
-                items = ShopItem.query.filter(ShopItem.name==row['itemname'])
+                items = ShopItem.query.filter(ShopItem.name==row['itemname']).all()
                 if not items:
                     item = ShopItem(name=row["itemname"])
                     print "Created ShopItem %s" % item.name
