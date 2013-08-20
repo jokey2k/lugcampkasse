@@ -1,14 +1,18 @@
+# python imports
 from datetime import datetime
 from itertools import ifilter
 import math
 from juggernaut import Juggernaut
 
+# flask base
 from flask import Flask, request, url_for, redirect, g, session, flash, \
      abort, render_template
 from flask.signals import Namespace
 
+# csrf
 from flaskext.csrf import csrf
 
+# sqlalchemy
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import event as sqla_event
 from sqlalchemy.sql.expression import func as sqla_func
@@ -36,8 +40,7 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 signals = Namespace()
 before_flush = signals.signal('models-before-flush')
 
-
-# Add flush signalling to session
+# Add flush signalling to session, used to auto-calculate balance later on
 class FlushSignalExtension(SessionExtension):
     def before_flush(self, session, flush_context, instances):
         before_flush.send(session.app, session=session, instances=instances)
