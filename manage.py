@@ -22,8 +22,12 @@ def dropdb():
     db.drop_all()
 
 @manager.command
-def import_csv(csv_filename):
-    """Imports accounts and vouchers from given CSV file. NOTE: delimiter char is ';', quotation is '"' """
+@manager.option("-i", "--init-db", dest="init_db", help="Init database before import")
+def import_csv(csv_filename, init_db=False):
+    """Imports accounts and vouchers from given CSV file. See docs for required fields"""
+
+    if init_db:
+        db.create_all()
 
     with open(csv_filename) as input_file:
         reader = csv.DictReader(input_file, delimiter=";")
