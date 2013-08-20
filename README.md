@@ -4,9 +4,11 @@ Cash managing for soft drinks and junk food. Used at LUG Camp 2012.
 
 **What can it do?**
 
-  * Realtime push notifications with Juggernaut
+  * Realtime push notifications (no Node.js usage any more, yey!)
   * Past bills
   * Voucher handling
+  * Scanning codes with a second device
+    * To do that, just scan your cashier-allowed code, type in password, scan again and click "activate"
 
 **What you need beforehand**
 
@@ -17,7 +19,7 @@ Cash managing for soft drinks and junk food. Used at LUG Camp 2012.
 **How to use it?**
 
   0. edit config.py, pick a random long secret key and disable DEBUG
-  1. make a virtualenv, maybe 
+  1. make a virtualenv, maybe
   ``virtualenv my_env && source my_env/bin/activate``
   2. ``pip install -r requirements.txt``
   3. ``python manage.py import_csv -i import.csv``
