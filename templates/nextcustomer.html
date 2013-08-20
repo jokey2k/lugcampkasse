@@ -2,6 +2,8 @@
 {% block title %}Neuer Kunde{% endblock %}
 {% block body %}
   <h2>Neuer Kunde wird erwartet</h2>
+{% endblock %}
+{% block jscode %}
   <script type=text/javascript>
   lugcampkasse.subscribeNewCustomer("{{ g.cashier.code }}");
   </script>
