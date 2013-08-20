@@ -209,10 +209,6 @@ def new_bill(code):
                 billentry = BillEntry(name=item.name, price=-item.price, bill=bill)
                 db.session.add(billentry)
             db.session.commit()
-            data = {
-                'items': len(bill_ids)
-            }
-            jug.publish('new-bill', data)
             return redirect(url_for('show_balance', code=user.code))
         except ValueError:
             flash("Error during bill creation, only provide integers!")
