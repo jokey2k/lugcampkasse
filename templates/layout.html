@@ -1,15 +1,6 @@
 <!doctype html>
 <title>LUG Camp Kasse {{ config.LUG_CAMP_YEAR_HEADLINE }} - {% block title %}Konto{% endblock %}</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<script type=text/javascript src="{{ config.JUGGERNAUT_DRIVER }}"></script>
-<script type=text/javascript src="{{ url_for('static', filename='jquery-1.7.2.min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.flot.min.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.flot.stack.min.js') }}"></script>
-<script src="{{ url_for('static', filename='graph.js') }}"></script>
-<script type=text/javascript src="{{ url_for('static', filename='lugcampkasse.js') }}"></script>
-<script type=text/javascript>
-  lugcampkasse.urlRoot = {{ request.url_root|tojson|safe }};
-</script>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
 <div class=page>
   <h1>LUG Camp Kasse</h1>
   {% if not disable_navigation %}
@@ -35,4 +26,14 @@
     <p class=flash>{{ message }}
   {% endfor %}
   {% block body %}{% endblock %}
+  <script type=text/javascript src="{{ url_for('static', filename='js/jquery-1.10.2.min.js') }}"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='js/flot/jquery.flot.min.js') }}"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='js/flot/jquery.flot.stack.min.js') }}"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='js/socketio/socket.io.min.js') }}"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='js/graph.js') }}"></script>
+  <script type=text/javascript src="{{ url_for('static', filename='js/lugcampkasse.js') }}"></script>
+  <script type=text/javascript>
+    lugcampkasse.urlRoot = {{ request.url_root|tojson|safe }};
+  </script>
+  {% block jscode %}{% endblock %}
 </div>
