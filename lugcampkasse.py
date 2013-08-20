@@ -1,12 +1,12 @@
 # python imports
 from datetime import datetime
 from itertools import ifilter
+import json
 import math
-from juggernaut import Juggernaut
 
 # flask base
 from flask import Flask, request, url_for, redirect, g, session, flash, \
-     abort, render_template
+     abort, render_template, Response
 from flask.signals import Namespace
 
 # csrf
@@ -18,16 +18,22 @@ from sqlalchemy import event as sqla_event
 from sqlalchemy.sql.expression import func as sqla_func
 from sqlalchemy.orm.interfaces import SessionExtension, EXT_CONTINUE
 
+# socket.io
+from socketio import socketio_manage
+from socketio.namespace import BaseNamespace
+from socketio.mixins import RoomsMixin, BroadcastMixin
+
+# redis
+from redis import Redis
+
 #
 # Flask app definiton
 #
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
-jug = Juggernaut()
 csrf(app)
 
 # register additional template commands
-
 def url_for_other_page(page):
     args = request.view_args.copy()
     args['page'] = page
@@ -126,26 +132,68 @@ def update_sums_and_balances(app, session, instances):
 before_flush.connect(update_sums_and_balances)
 
 #
-# Event notification broadcast
+# Socket.IO handling
 #
-def send_updated_balance_notification(user):
-    """Notifies clients about updated balance"""
+class CashierNamespace(BaseNamespace):
+    """Notifications sent between cashier interfaces, selects events by hand for improved security"""
 
-    data = {'balance': "%6.2f" % (user.balance/100),
-            'updated_on': "Live aktualisiert: %s" % datetime.now().strftime('%H:%M @ %d.%m.%Y')}
-    jug.publish('updated-balance:%s' % user.code, data)
+    def initialize(self):
+        self.debug = app.config["DEBUG"]
+        self.logger = app.logger
+        if self.debug:
+            self.log("Socketio session started")
+        self.redis_credentials = dict(
+            host=app.config["REDIS_HOST"],
+            port=app.config["REDIS_PORT"],
+            db=app.config["REDIS_DB"])
 
-def send_new_customer_notification(cashier_code, new_customer_code):
-    """Notifies cashier clients about new user scan"""
+    def log(self, message):
+        self.logger.info("[{0}] {1}".format(self.socket.sessid, message))
 
-    data = {'code': new_customer_code}
-    jug.publish('new-customer:%s' % cashier_code, data)
+    def _job_redis_pubsub(self, channelname):
+        """Subscribes to given channel in redis and retransmit all msgs sent to it"""
 
-def send_redeem_voucher_notification(cashier_code, voucher_code):
-    """Notifies cashier about newly scanned voucher"""
+        redis = Redis(**self.redis_credentials)
+        pubsub = redis.pubsub()
+        pubsub.subscribe(channelname)
+        if self.debug:
+            self.log("Connected to redis and subscribed to channel %s" % channelname)
 
-    data = {'code': voucher_code}
-    jug.publish('scanned-voucher:%s' % cashier_code, data)
+        for notification in pubsub.listen():
+            if not notification['type'] == 'message':
+                if self.debug:
+                    self.log("Ignoring notification: %s" % notification)
+                continue
+            if self.debug:
+                self.log("Received event on redis channel %s: %s" % (channelname, notification['data']))
+            self.emit(channelname, notification['data'])
+            if self.debug:
+                self.log("Notification forwarded to client")
+
+    def on_new_customer_subscribe(self, code):
+        self.listen_code = code
+        self.spawn(self.job_listen_new_customer)
+
+    def on_scanned_voucher_subscribe(self, code):
+        self.listen_code = code
+        self.spawn(self.job_listen_scanned_voucher)
+
+    def job_listen_new_customer(self):
+        self._job_redis_pubsub('cashier_new_customer_%s' % self.listen_code)
+
+    def job_listen_scanned_voucher(self):
+        self._job_redis_pubsub('cashier_scanned_voucher_%s' % self.listen_code)
+
+
+def notify_client_update(channel, data):
+    """Publishes given message via redis to clients"""
+
+    redis = Redis(host=app.config["REDIS_HOST"],
+                  port=app.config["REDIS_PORT"],
+                  db=app.config["REDIS_DB"])
+    if app.config["DEBUG"]:
+        app.logger.info("Publishing new notification sent to channel %s: %s" % (channel, data))
+    redis.publish(channel, json.dumps(data))
 
 #
 # Custom request handlers
@@ -166,6 +214,16 @@ def access_denied(e):
 def access_denied(e):
     return render_template('error404.html'), 404
 
+# route socket.io request to defined namespaces...
+@app.route('/socket.io/<path:remaining>')
+def socketio(remaining):
+    try:
+        socketio_manage(request.environ, {'/cashier': CashierNamespace}, request)
+    except:
+        app.logger.error("Exception while handling socketio connection",
+                         exc_info=True)
+    return Response()
+
 #
 # Buying and display
 #
@@ -177,8 +235,8 @@ def usercode(code):
         if code == g.cashier.code:
             return redirect(url_for('devices', disable_navigation=True, ownercode=g.cashier.code))
         if session['scan_device']:
-            send_new_customer_notification(g.cashier.code, code)
             user = User.get_by_code(code)
+            notify_client_update('cashier_new_customer_%s' % g.cashier.code, {'code': code})
             return render_template('new_customer_notification.html', disable_navigation=True, user=user)
         return redirect(url_for('new_bill', code=code))
 
@@ -255,7 +313,7 @@ def vouchercode(code):
         voucher.valid = False
 
     if voucher.valid and g.cashier and session['scan_device']:
-        send_redeem_voucher_notification(g.cashier.code, code)
+        notify_client_update('cashier_scanned_voucher_%s' % g.cashier.code, {'code': code})
 
     return render_template("vouchercode.html", voucher=voucher)
 
