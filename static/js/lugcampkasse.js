@@ -1,12 +1,16 @@
 (function() {
   var global = this;
 
-  var jug = new Juggernaut({secure:true});
+  var WEB_SOCKET_SWF_LOCATION = '/static/js/socketio/WebSocketMain.swf';
 
   var lib = global.lugcampkasse = {
     urlRoot : '/',
-    jug : jug,
     localbill : Array(),
+    socket:'',
+
+    connectSocket: function() {
+        lib.socket = io.connect('/cashier');
+    },
 
     autoHideFlashes : function() {
       var flashes = $('p.flash:visible').hide();
@@ -26,22 +30,19 @@
         .slideDown('fast');
     },
 
-    subscribeUpdatedBalance : function(userCode) {
-      jug.subscribe('updated-balance:' + userCode, function(data) {
-        $('span#balance').text(data.balance);
-        $('span#liveupdated').text(' (' + data.updated_on + ')');
-        $('.bills').hide();
-      });
-    },
-
     subscribeNewCustomer : function(cashierCode) {
-      jug.subscribe('new-customer:' + cashierCode, function(data) {
-        window.location = "/" + data.code + "/new_bill";
+      lib.connectSocket();
+      lib.socket.emit("new_customer_subscribe", cashierCode)
+      lib.socket.on("cashier_new_customer_" + cashierCode, function(data) {
+        var content = jQuery.parseJSON(data);
+        window.location = "/" + content.code + "/new_bill";
       });
     },
 
     subscribeScannedVoucher : function(cashierCode) {
-      jug.subscribe('scanned-voucher:' + cashierCode, function(data) {
+      lib.connectSocket();
+      lib.socket.emit("scanned_voucher_subscribe", cashierCode)
+      lib.socket.on("cashier_scanned_voucher_" + cashierCode, function(data) {
         $('#vouchercodefield')[0].value = data.code;
         document.forms[0].submit();
       });
