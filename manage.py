@@ -1,9 +1,12 @@
+#!/usr/bin/env python
 import csv
 
 from flask.ext.script import Manager
 
 from lugcampkasse import app, db, User, Bill, BillEntry, Voucher, ShopItem
 
+from gevent import monkey
+from socketio.server import SocketIOServer
 
 manager = Manager(app)
 
@@ -80,6 +83,20 @@ def import_csv(csv_filename):
                         category = 0
                     item.value = value
         db.session.commit()
+
+@manager.command
+def runserver():
+    """Runs webserver as SocketIOServer"""
+
+    monkey.patch_all()
+
+    print "Listening on http://%s:%s and port %s for flash policy requests" % (
+        app.config["BIND_IP"], app.config["HTTP_PORT"], app.config["FLASH_POLICY_PORT"])
+    SocketIOServer(
+        (app.config["BIND_IP"], app.config["HTTP_PORT"]),
+        app, resource="socket.io",
+        policy_server=True,
+        policy_listener=(app.config["BIND_IP"], app.config["FLASH_POLICY_PORT"])).serve_forever()
 
 if __name__ == '__main__':
     manager.run()
