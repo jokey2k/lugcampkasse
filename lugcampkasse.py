@@ -284,6 +284,9 @@ def redeem_voucher(code):
             flash("No such voucher")
     return render_template("redeem_voucher.html", user=user)
 
+#
+# Shortcut if vouchers are not wanted
+#
 @app.route('/<string(length=6):code>/quick_payment', methods=['GET', 'POST'])
 def quick_payment(code):
     if not g.cashier:
