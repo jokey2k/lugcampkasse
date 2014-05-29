@@ -34,6 +34,8 @@ Cash managing for soft drinks and junk food. Used at LUG Camp 2012.
 
   To get your user info (typically badge to name mapping), vouchers and buyable items into the system, a simple table is used. The following colums are required when you want to import something, the ordering does not matter. Simply use the default file and populate with rows as you need.
 
+  **Note** European CSV conventions are used, so quotation sign is double-quote and delimiter is semicolon
+
   For user import::
 
     * usercode (6 chars A-Za-z0-9 string)
@@ -53,3 +55,4 @@ Cash managing for soft drinks and junk food. Used at LUG Camp 2012.
     * itemname
     * itemprice (integers -> cents, format in the template to EUR/USD/whatever !)
     * itemcategory (0 or 1 or 2, can be others but then you need to rewrite the html template)
+
