@@ -13,10 +13,10 @@ from flask.signals import Namespace
 from flaskext.csrf import csrf
 
 # sqlalchemy
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy as SQLAlchemyBase
 from sqlalchemy import event as sqla_event
+from sqlalchemy.orm.session import Session as SQLA_SessionBase
 from sqlalchemy.sql.expression import func as sqla_func
-from sqlalchemy.orm.interfaces import SessionExtension, EXT_CONTINUE
 
 # socket.io
 from socketio import socketio_manage
@@ -47,15 +47,26 @@ signals = Namespace()
 before_flush = signals.signal('models-before-flush')
 
 # Add flush signalling to session, used to auto-calculate balance later on
-class FlushSignalExtension(SessionExtension):
-    def before_flush(self, session, flush_context, instances):
+class _CustomSessionSignalEvents(object):
+    def register(self):
+        sqla_event.listen(SQLA_SessionBase, 'before_flush', self.session_signal_before_flush)
+
+    @staticmethod
+    def session_signal_before_flush(session, flush_context, instances):
         before_flush.send(session.app, session=session, instances=instances)
-        return EXT_CONTINUE
+
+
+class SQLAlchemy(SQLAlchemyBase):
+    def __init__(self, app=None,
+                 use_native_unicode=True,
+                 session_options=None):
+        SQLAlchemyBase.__init__(self, app, use_native_unicode, session_options)
+        _CustomSessionSignalEvents().register()
 
 #
 # SQLAlchemy setup
 #
-db = SQLAlchemy(app, {'session_extensions': [FlushSignalExtension(), ]})
+db = SQLAlchemy(app)
 
 #
 # Data Model
