@@ -90,7 +90,7 @@ def import_csv(csv_filename, init_db=False):
                         category = int(row["itemcategory"])
                     except ValueError:
                         category = 0
-                    item.value = value
+                    item.category = category
         db.session.commit()
 
 @manager.command
