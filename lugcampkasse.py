@@ -216,6 +216,9 @@ def set_request_environment():
         g.cashier = User.query.get(session['cashier'])
     if 'scan_device' not in session:
         session['scan_device'] = False
+    beer_item = ShopItem.query.filter_by(name=app.config["BEER_NAME"]).first()
+    g.beer_name = app.config["BEER_NAME"]
+    g.beer_price = beer_item.price if beer_item else 70
 
 @app.errorhandler(403)
 def access_denied(e):

@@ -11,7 +11,7 @@
 {% else %}
 	<span class="red">
 {% endif %}
-{{ "%.2f"|format(user.balance/100) }}</span> EUR 
-{% if (user.balance/70) > 0 %}(reicht noch für {{ (user.balance/70)|int }} Flens){% endif %}
+{{ "%.2f"|format(user.balance/100) }}</span> EUR
+{% if (user.balance/g.beer_price) > 0 %}(reicht noch für {{ (user.balance/g.beer_price)|int }} {{ g.beer_name }}){% endif %}
   </ul>
 {% endmacro %}
