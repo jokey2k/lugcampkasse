@@ -441,3 +441,9 @@ def graph_all():
                 sellings[key][product] += 1
 
     return render_template("graph.html", sellings=sellings)
+
+@app.route('/stats/accounts')
+def account_list():
+    if not g.cashier:
+        abort(403)
+    return render_template("account_list.html", users=User.query.order_by(User.code).all())

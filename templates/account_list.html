@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Account balance list{% endblock %}
+{% block body %}
+  <table id="data" data-graph-target="#graph-target" border=1>
+    <thead>
+      <th>Kunde</th>
+      <th>Kontostand</th>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.name }}</td>
+          {% if user.balance < 0 %}
+          <td style="text-align: right;"><span style="color:red">{{ "%.2f"|format(user.balance/100.0) }}</span> EUR</td>
+          {% else %}
+          <td style="text-align: right;">{{ "%.2f"|format(user.balance/100.0) }} EUR</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
