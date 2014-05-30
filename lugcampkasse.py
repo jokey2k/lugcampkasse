@@ -412,26 +412,29 @@ def signout():
 #
 @app.route('/graph/all')
 def graph_all():
-    entries = BillEntry.query.all()
+
+    bills = Bill.query.order_by(Bill.created).all()
+    startdate = bills[0].created
 
     sellings = {}
 
     for i in range(0, 96):
         sellings[i] = {
             'all':0,
-            'flens': 0
+            'beer': 0
         }
 
-    for entry in entries:
-        key = entry.bill.created.hour + (entry.bill.created.day-17) * 24
+    for bill in bills:
+        delta = bill.created - startdate
+        key = delta.days * 24 + (delta.seconds / 3600)
 
-        if entry.name.find('Flens') > -1:
-            product = 'flens'
-        else:
-            product = 'all'
+        for entry in bill.entries:
+            if entry.name.find(app.config["BEER_NAME"]) > -1:
+                product = 'beer'
+            else:
+                product = 'all'
 
-        if key in sellings:
-            sellings[key][product] += 1
+            if key in sellings:
+                sellings[key][product] += 1
 
     return render_template("graph.html", sellings=sellings)
-
