@@ -73,7 +73,7 @@ db = SQLAlchemy(app)
 #
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(6))
+    code = db.Column(db.String(10))
     name = db.Column(db.String(150))
     lug = db.Column(db.String(100))
     balance = db.Column(db.Integer, nullable=False, default=0)
@@ -241,7 +241,7 @@ def socketio(remaining):
 #
 # Buying and display
 #
-@app.route('/<string(length=6):code>')
+@app.route('/<string(length=10):code>')
 def usercode(code):
     """Request from User to show balance or from cashier to change to User"""
 
@@ -256,22 +256,22 @@ def usercode(code):
 
     return redirect(url_for('show_balance', code=code))
 
-@app.route('/<string(length=6):code>/balance/', defaults={'page': 1})
-@app.route('/<string(length=6):code>/balance/page/<int:page>')
+@app.route('/<string(length=10):code>/balance/', defaults={'page': 1})
+@app.route('/<string(length=10):code>/balance/page/<int:page>')
 def show_balance(code, page):
     user = User.get_by_code(code)
     pagination = Bill.query.filter_by(user=user).paginate(page)
     flens = int(math.floor(user.balance/70))
     return render_template('balance.html', user=user, pagination=pagination, flens=flens)
 
-@app.route('/<string(length=6):code>/bill/<int:bill_id>')
+@app.route('/<string(length=10):code>/bill/<int:bill_id>')
 def show_bill(code, bill_id):
     user = User.get_by_code(code)
     bill = Bill.query.filter_by(user=user).filter_by(id=bill_id).first_or_404()
     flens = int(math.floor(bill.user.balance/70))
     return render_template('show_bill.html', bill=bill, flens=flens)
 
-@app.route('/<string(length=6):code>/new_bill', methods=['GET', 'POST'])
+@app.route('/<string(length=10):code>/new_bill', methods=['GET', 'POST'])
 def new_bill(code):
     user = User.get_by_code(code)
     if request.method == "POST":
@@ -290,7 +290,7 @@ def new_bill(code):
     items = ShopItem.query.order_by(ShopItem.category).all()
     return render_template('new_bill.html', user=user, items=items)
 
-@app.route('/<string(length=6):code>/bill/<int:bill_id>/cancel_item/<int:item_id>', methods=['GET', 'POST'])
+@app.route('/<string(length=10):code>/bill/<int:bill_id>/cancel_item/<int:item_id>', methods=['GET', 'POST'])
 def cancel_item(code,bill_id,item_id):
     if not g.cashier:
         abort(403)
@@ -331,7 +331,7 @@ def vouchercode(code):
 
     return render_template("vouchercode.html", voucher=voucher)
 
-@app.route('/<string(length=6):code>/voucher', methods=['GET', 'POST'])
+@app.route('/<string(length=10):code>/voucher', methods=['GET', 'POST'])
 def redeem_voucher(code):
     if not g.cashier:
         abort(403)
@@ -358,7 +358,7 @@ def redeem_voucher(code):
 #
 # Shortcut if vouchers are not wanted
 #
-@app.route('/<string(length=6):code>/quick_payment', methods=['GET', 'POST'])
+@app.route('/<string(length=10):code>/quick_payment', methods=['GET', 'POST'])
 def quick_payment(code):
     if not g.cashier:
         return redirect(url_for('show_balance', code=code))
