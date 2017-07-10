@@ -9,7 +9,7 @@
     <tbody>
       {% for user in users %}
         <tr>
-          <td>{{ user.name }}</td>
+          <td><a href="/{{ user.code }}">{{ user.name }}</a></td>
           {% if user.balance < 0 %}
           <td style="text-align: right;"><span style="color:red">{{ "%.2f"|format(user.balance/100.0) }}</span> EUR</td>
           {% else %}
