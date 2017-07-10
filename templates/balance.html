@@ -21,9 +21,11 @@
   	<input type=submit value="Los">
   </form>
   {% endif %}
+{% endblock %}
+{% block jscode %}
   <script type=text/javascript>
-    lugcampkasse.subscribeUpdatedBalance("{{ user.code }}");
   {% if g.cashier %}
+    lugcampkasse.subscribeNewCustomer("{{ g.cashier.code }}");
     window.setTimeout("window.location='{{ url_for('nextcustomer') }}'", 15000);
   {% endif %}
   </script>
