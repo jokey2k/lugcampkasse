@@ -448,4 +448,4 @@ def graph_all():
 def account_list():
     if not g.cashier:
         abort(403)
-    return render_template("account_list.html", users=User.query.order_by(User.code).all())
+    return render_template("account_list.html", users=User.query.order_by(User.name).all())
