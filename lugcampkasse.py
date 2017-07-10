@@ -273,6 +273,8 @@ def show_bill(code, bill_id):
 
 @app.route('/<string(length=10):code>/new_bill', methods=['GET', 'POST'])
 def new_bill(code):
+    if not g.cashier:
+        abort(403)
     user = User.get_by_code(code)
     if request.method == "POST":
         try:
