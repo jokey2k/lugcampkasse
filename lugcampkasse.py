@@ -1,6 +1,5 @@
 # python imports
 from datetime import datetime
-from itertools import ifilter
 import json
 import math
 
@@ -133,12 +132,12 @@ def update_sums_and_balances(app, session, instances):
     # First update all bill sums
     for session_changed in [session.new, session.deleted, session.dirty]:
         predicate = lambda s: isinstance(s, BillEntry)
-        for entry in ifilter(predicate, session_changed):
+        for entry in filter(predicate, session_changed):
             entry.bill.update_accumulated()
     # Then update all users balances
     for session_changed in [session.new, session.deleted, session.dirty]:
         predicate = lambda s: isinstance(s, Bill)
-        for entry in ifilter(predicate, session_changed):
+        for entry in filter(predicate, session_changed):
             entry.user.update_balance()
 before_flush.connect(update_sums_and_balances)
 
