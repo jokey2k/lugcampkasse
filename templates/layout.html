@@ -27,13 +27,13 @@
     <p class=flash>{{ message }}
   {% endfor %}
   {% block body %}{% endblock %}
-  <script type=text/javascript src="{{ url_for('static', filename='js/jquery-1.10.2.min.js') }}"></script>
-  <script type=text/javascript src="{{ url_for('static', filename='js/flot/jquery.flot.min.js') }}"></script>
-  <script type=text/javascript src="{{ url_for('static', filename='js/flot/jquery.flot.stack.min.js') }}"></script>
-  <script type=text/javascript src="{{ url_for('static', filename='js/socketio/socket.io.min.js') }}"></script>
-  <script type=text/javascript src="{{ url_for('static', filename='js/graph.js') }}"></script>
-  <script type=text/javascript src="{{ url_for('static', filename='js/lugcampkasse.js') }}"></script>
-  <script type=text/javascript>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/flot/jquery.flot.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/flot/jquery.flot.stack.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/socketio/socket.io.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/graph.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/lugcampkasse.js') }}"></script>
+  <script type="text/javascript">
     lugcampkasse.urlRoot = {{ request.url_root|tojson|safe }};
   </script>
   {% block jscode %}{% endblock %}
