@@ -1,15 +1,13 @@
 (function() {
   var global = this;
 
-  var WEB_SOCKET_SWF_LOCATION = '/static/js/socketio/WebSocketMain.swf';
-
   var lib = global.lugcampkasse = {
     urlRoot : '/',
     localbill : Array(),
     socket:'',
 
     connectSocket: function() {
-        lib.socket = io.connect('/cashier');
+        lib.socket = io.connect('http://' + document.domain + ':' + location.port);
     },
 
     autoHideFlashes : function() {
@@ -33,16 +31,15 @@
     subscribeNewCustomer : function(cashierCode) {
       lib.connectSocket();
       lib.socket.emit("new_customer_subscribe", cashierCode)
-      lib.socket.on("cashier_new_customer_" + cashierCode, function(data) {
-        var content = jQuery.parseJSON(data);
-        window.location = "/" + content.code + "/new_bill";
+      lib.socket.on("cashier_new_customer", function(data) {
+        window.location = "/" + data.code + "/new_bill";
       });
     },
 
     subscribeScannedVoucher : function(cashierCode) {
       lib.connectSocket();
       lib.socket.emit("scanned_voucher_subscribe", cashierCode)
-      lib.socket.on("cashier_scanned_voucher_" + cashierCode, function(data) {
+      lib.socket.on("cashier_scanned_voucher", function(data) {
         $('#vouchercodefield')[0].value = data.code;
         document.forms[0].submit();
       });
@@ -75,9 +72,10 @@
     $('#data').graphy(
       { colors: ['#dd0000', '#dddd00'], yaxis: { label: ' asd' }, xaxis: {mode: "time"}, series: {stack: true, lines: { show: true, fill: true}} },
       function(plot, plotData) {
-        jug.subscribe('new-bill', function(data) {
+        lib.connectSocket();
+        lib.socket.on("new_bill", function(data) {
           window.location.reload();
-        })
+        });
       }
     );
   });

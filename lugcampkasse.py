@@ -12,18 +12,13 @@ from flask.signals import Namespace
 from flaskext.csrf import csrf
 
 # sqlalchemy
-from flask.ext.sqlalchemy import SQLAlchemy as SQLAlchemyBase
+from flask_sqlalchemy import SQLAlchemy as SQLAlchemyBase
 from sqlalchemy import event as sqla_event
 from sqlalchemy.orm.session import Session as SQLA_SessionBase
 from sqlalchemy.sql.expression import func as sqla_func
 
 # socket.io
-from socketio import socketio_manage
-from socketio.namespace import BaseNamespace
-from socketio.mixins import RoomsMixin, BroadcastMixin
-
-# redis
-from redis import Redis
+from flask_socketio import SocketIO, emit as socketio_emit, join_room as socketio_join_room
 
 #
 # Flask app definiton
@@ -31,6 +26,7 @@ from redis import Redis
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 csrf(app)
+socketio = SocketIO(app, logger=True)
 
 # register additional template commands
 def url_for_other_page(page):
@@ -40,7 +36,7 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 #
-# Blinker custom signals
+# State signals
 #
 signals = Namespace()
 before_flush = signals.signal('models-before-flush')
@@ -144,66 +140,19 @@ before_flush.connect(update_sums_and_balances)
 #
 # Socket.IO handling
 #
-class CashierNamespace(BaseNamespace):
-    """Notifications sent between cashier interfaces, selects events by hand for improved security"""
+def notify_new_customer(cashier, new_customer):
+    print("Notify for customer %s to cashier with code %s" % (new_customer, cashier.code))
+    socketio.emit('cashier_new_customer', {'code': new_customer}, room="%s" % cashier.code)
 
-    def initialize(self):
-        self.debug = app.config["DEBUG"]
-        self.logger = app.logger
-        if self.debug:
-            self.log("Socketio session started")
-        self.redis_credentials = dict(
-            host=app.config["REDIS_HOST"],
-            port=app.config["REDIS_PORT"],
-            db=app.config["REDIS_DB"])
+def notify_scanned_voucher(cashier, voucher_code):
+    socketio.emit('cashier_scanned_voucher', {'code': voucher_code}, room="%s" % cashier.code)
 
-    def log(self, message):
-        self.logger.info("[{0}] {1}".format(self.socket.sessid, message))
-
-    def _job_redis_pubsub(self, channelname):
-        """Subscribes to given channel in redis and retransmit all msgs sent to it"""
-
-        redis = Redis(**self.redis_credentials)
-        pubsub = redis.pubsub()
-        pubsub.subscribe(channelname)
-        if self.debug:
-            self.log("Connected to redis and subscribed to channel %s" % channelname)
-
-        for notification in pubsub.listen():
-            if not notification['type'] == 'message':
-                if self.debug:
-                    self.log("Ignoring notification: %s" % notification)
-                continue
-            if self.debug:
-                self.log("Received event on redis channel %s: %s" % (channelname, notification['data']))
-            self.emit(channelname, notification['data'])
-            if self.debug:
-                self.log("Notification forwarded to client")
-
-    def on_new_customer_subscribe(self, code):
-        self.listen_code = code
-        self.spawn(self.job_listen_new_customer)
-
-    def on_scanned_voucher_subscribe(self, code):
-        self.listen_code = code
-        self.spawn(self.job_listen_scanned_voucher)
-
-    def job_listen_new_customer(self):
-        self._job_redis_pubsub('cashier_new_customer_%s' % self.listen_code)
-
-    def job_listen_scanned_voucher(self):
-        self._job_redis_pubsub('cashier_scanned_voucher_%s' % self.listen_code)
-
-
-def notify_client_update(channel, data):
-    """Publishes given message via redis to clients"""
-
-    redis = Redis(host=app.config["REDIS_HOST"],
-                  port=app.config["REDIS_PORT"],
-                  db=app.config["REDIS_DB"])
-    if app.config["DEBUG"]:
-        app.logger.info("Publishing new notification sent to channel %s: %s" % (channel, data))
-    redis.publish(channel, json.dumps(data))
+@socketio.on('new_customer_subscribe')
+def new_customer_subscribe(json):
+    if 'cashier' in session:
+        cashier = User.query.get(session['cashier'])
+        socketio_join_room(cashier.code)
+        print("Subscribed to room %s" % cashier.code)
 
 #
 # Custom request handlers
@@ -227,16 +176,6 @@ def access_denied(e):
 def access_denied(e):
     return render_template('error404.html'), 404
 
-# route socket.io request to defined namespaces...
-@app.route('/socket.io/<path:remaining>')
-def socketio(remaining):
-    try:
-        socketio_manage(request.environ, {'/cashier': CashierNamespace}, request)
-    except:
-        app.logger.error("Exception while handling socketio connection",
-                         exc_info=True)
-    return Response()
-
 #
 # Buying and display
 #
@@ -249,7 +188,7 @@ def usercode(code):
             return redirect(url_for('devices', disable_navigation=True, ownercode=g.cashier.code))
         if session['scan_device']:
             user = User.get_by_code(code)
-            notify_client_update('cashier_new_customer_%s' % g.cashier.code, {'code': code})
+            notify_new_customer(g.cashier, code)
             return render_template('new_customer_notification.html', disable_navigation=True, user=user)
         return redirect(url_for('new_bill', code=code))
 
