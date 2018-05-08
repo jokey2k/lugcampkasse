@@ -1,6 +1,7 @@
 usercode;name;lug;cashier;initialcredit;blocked;vouchercode;vouchervalue;itemname;itemprice;itemcategory
-1A2B3C;Hans (Kassenwart);LUG D;1;100;;;;;;
-2A3B4C;Stefan;LUG H;0;500;;;;;;
+1A2B3C4D5E;Hans (Kassenwart);LUG D;1;100;;;;;;
+2A3B4C5D6E;Stefan;LUG H;0;500;;;;;;
+3A4B5C6D7E;User mit Ü im Namen;LUG H;0;500;;;;;;
 ;;;;;;;;Flens;100;0
 ;;;;;;;;Cola;150;0
 ;;;;;;;;Snack;80;1
